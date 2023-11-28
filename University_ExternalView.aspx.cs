@@ -1,0 +1,63 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+public partial class University_ExternalView : System.Web.UI.Page
+{
+    dbop ob = new dbop();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            MultiView1.SetActiveView(View1);
+            string s1 = "select * from Course";
+            DataTable db1 = ob.ret(s1);
+            string s2 = "select * from Batch";
+            DataTable db2 = ob.ret(s2);
+            string s3 = "select * from College";
+            DataTable db3 = ob.ret(s3);
+
+            DropDownList1.DataSource = db1;
+            DropDownList1.DataTextField = "c_name";
+            DropDownList1.DataValueField = "c_id";
+            DropDownList1.DataBind();
+
+
+            DropDownList2.DataSource = db2;
+            DropDownList2.DataTextField = "BatchName";
+            DropDownList2.DataValueField = "Batch_id";
+            DropDownList2.DataBind();
+
+            DropDownList4.DataSource = db3;
+            DropDownList4.DataTextField = "College_Name";
+            DropDownList4.DataValueField = "Clg_id";
+            DropDownList4.DataBind();
+        }
+
+
+    }
+    protected void Button3_Click(object sender, EventArgs e)
+    {
+
+        string t = "SELECT Batch.BatchName, Course.c_name, student.*FROM  Batch INNER JOIN student ON Batch.Batch_id = student.Batch_id INNER JOIN Course ON student.c_id = Course.c_id where student.c_id='" + DropDownList1.SelectedValue + "'and student.Batch_id='" + DropDownList2.Text + "'and student.semester='" + DropDownList3.Text + "'";
+        DataTable db5 = ob.ret(t);
+        DataGrid1.DataSource = db5;
+        DataGrid1.DataBind();
+    }
+    protected void DataGrid1_ItemCommand(object source, DataGridCommandEventArgs e)
+    {
+        string h = "SELECT ExternalMark.*, InternalMark.mark ,Subject.sub_code,Subject.sub_name FROM Subject INNER JOIN InternalMark ON Subject.Sub_id = InternalMark.sub_id INNER JOIN  ExternalMark ON Subject.Sub_id = ExternalMark.sub_id where InternalMark.student_id='" + e.Item.Cells[1].Text + "' and InternalMark.sem='" + DropDownList3.Text + "'";
+        DataTable db6 = ob.ret(h);
+        DataGrid2.DataSource = db6;
+        DataGrid2.DataBind();
+        MultiView1.SetActiveView(View2);
+    }
+    protected void DataGrid1_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
+    }
+}
